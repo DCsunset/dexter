@@ -16,15 +16,15 @@ class Metrics:
 		
 	
 	def timedFuncCall(self, func):
-		start = datetime.time()
+		start = datetime.datetime.now()
 		ret = func()
-		end = datetime.time()
+		end = datetime.datetime.now()
 		self._totalTime += end - start
 		self._count += 1
 		return ret
 
 	def getThroughput(self):
-		expTimeinSeconds = datetime.timedelta(self._expEnd - self._expStart).seconds
+		expTimeinSeconds = (self._expEnd - self._expStart).total_seconds()
 		return self._count / expTimeinSeconds
 	
 	def getLatency(self):
