@@ -32,3 +32,11 @@ class Executor:
 		for handle in self.handles:
 			handle.kill()
 		self.handles = []
+
+"""
+Run and wait for commands
+"""
+def run_and_wait(commands):
+	executor = Executor(commands)
+	executor.run()
+	executor.wait()
