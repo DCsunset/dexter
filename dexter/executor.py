@@ -23,6 +23,7 @@ class Executor:
 	def wait(self):
 		for handle in self.handles:
 			handle.wait()
+		self.handles = []
 		
 	"""
 	Kill all commands
@@ -30,3 +31,4 @@ class Executor:
 	def kill(self):
 		for handle in self.handles:
 			handle.kill()
+		self.handles = []
