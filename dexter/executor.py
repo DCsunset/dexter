@@ -14,16 +14,19 @@ class Executor:
 	"""
 	def run(self):
 		for cmd in self.commands:
-			handle = subprocess.Popen(cmd, shell=True)
+			handle = subprocess.Popen(cmd, text=True, shell=True, stdout=subprocess.PIPE)
 			self.handles.append(handle)
 		
 	"""
 	Wait for all commands to finish
 	"""
-	def wait(self):
+	def wait(self) -> List[str]:
+		outputs = []
 		for handle in self.handles:
-			handle.wait()
+			output = handle.communicate()[0]
+			outputs.append(output)
 		self.handles = []
+		return outputs
 		
 	"""
 	Kill all commands
@@ -36,7 +39,7 @@ class Executor:
 """
 Run and wait for commands
 """
-def run_and_wait(commands):
+def run_and_wait(commands: List[str]) -> List[str]:
 	executor = Executor(commands)
 	executor.run()
-	executor.wait()
+	return executor.wait()
