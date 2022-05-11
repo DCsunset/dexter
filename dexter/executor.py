@@ -12,9 +12,13 @@ class Executor:
 	"""
 	Run commands in parallel
 	"""
-	def run(self):
+	def run(self, collectOutput=True):
+		if collectOutput:
+			stdout = subprocess.PIPE
+		else:
+			stdout = None
 		for cmd in self.commands:
-			handle = subprocess.Popen(cmd, text=True, shell=True, stdout=subprocess.PIPE)
+			handle = subprocess.Popen(cmd, text=True, shell=True, stdout=stdout)
 			self.handles.append(handle)
 		
 	"""
@@ -39,7 +43,7 @@ class Executor:
 """
 Run and wait for commands
 """
-def run_and_wait(commands: List[str]) -> List[str]:
+def run_and_wait(commands: List[str], collectOutput=True) -> List[str]:
 	executor = Executor(commands)
-	executor.run()
+	executor.run(collectOutput=collectOutput)
 	return executor.wait()
