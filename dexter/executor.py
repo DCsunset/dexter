@@ -5,6 +5,7 @@ import multiprocessing
 
 def run_command(cmd, stdout):
 	ret = subprocess.Popen(cmd, text=True, shell=True, stdout=stdout)
+	ret.wait()
 	return ret.stdout
 
 class Executor:
