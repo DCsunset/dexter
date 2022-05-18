@@ -1,5 +1,11 @@
 from typing import List
+from functools import partial
 import subprocess
+import multiprocessing
+
+def run_command(cmd, stdout):
+	ret = subprocess.Popen(cmd, text=True, shell=True, stdout=stdout)
+	return ret.stdout
 
 class Executor:
 	"""
@@ -7,38 +13,34 @@ class Executor:
 	"""
 	def __init__(self, commands: List[str]):
 		self.commands = commands
-		self.handles = []
+		self.pool = None
+		self.outputs = None
 	
 	"""
 	Run commands in parallel
 	"""
-	def run(self, collectOutput=True):
+	def run(self, collectOutput=True, processes=None):
 		if collectOutput:
 			stdout = subprocess.PIPE
 		else:
 			stdout = None
-		for cmd in self.commands:
-			handle = subprocess.Popen(cmd, text=True, shell=True, stdout=stdout)
-			self.handles.append(handle)
+
+		self.pool = multiprocessing.Pool(processes=processes)
+		func = partial(run_command, stdout=stdout)
+		self.outputs = self.pool.map_async(func, self.commands)
 		
 	"""
 	Wait for all commands to finish
 	"""
 	def wait(self) -> List[str]:
-		outputs = []
-		for handle in self.handles:
-			output = handle.communicate()[0]
-			outputs.append(output)
-		self.handles = []
-		return outputs
+		self.outputs.wait()
+		return self.outputs.get()
 		
 	"""
 	Kill all commands
 	"""
 	def kill(self):
-		for handle in self.handles:
-			handle.kill()
-		self.handles = []
+		self.pool.terminate()
 
 """
 Run and wait for commands
